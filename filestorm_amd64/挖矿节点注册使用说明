@@ -1,0 +1,66 @@
+
+安装ipfs说明：
+1.cd ~/filestorm/
+2.chmod 0755 ipfs
+3.cp -f ipfs /bin/
+
+
+安装stormcatcher说明（请先保证ipfs已经安装，并能通过ipfs version看到版本号）：
+1.下载并上传对应版本stormcatcher
+2.运行stormcatcher（如：nohup ./stormcatcher-linux(系统类型)-amd64(cpu型号) >storm.out 2>&1 &），如果没有执行权限，请先chmod 0755 stormcatcher-linux(系统类型)-amd64(cpu型号)
+3.查看log文件，tail -100f storm.out，出现如下信息表示正常运行中
+---------------------------------------------------------------
+StormCatcher has started. Your storage miner is ready to work.
+---------------------------------------------------------------
+
+
+获取注册ID（Register ID）说明：
+1.需要开启对外访问的3个端口（如：4001，5001，8080），如果检测不到这些端口的访问，会被踢出切片的
+2.需要获取到硬盘挂载目录（可以使用df命令查看所有硬盘信息）
+3.发送get请求获取注册ID（如：curl http://127.0.0.1:9527/addRegisterDevice -d "devicePath=/dev/sda5&ipfsApiPort=5001&ipfsGatewayPort=8080&ipfsSwarmPort=4001"），返回注册ID字符串信息，更多说明在附加说明里有
+4.看到如下log表示A设备已经注册成功，还未加入切片
+/dev/sda1(A设备目录) verify IPFS file
+not generated shard ID!
+5.看到如下log表示A设备已经注册成功，已加入切片，挖矿中
+/dev/sda1(A设备目录) verify IPFS file
+wait file verify handle!
+
+
+附加说明：
+新版本用局域网接口访问的形式操作，正式上线会出页面访问版本
+开放的端口：9527
+1.注册设备
+请求方式：GET
+接口为：addRegisterDevice
+参数：
+设备（挂载或分区）路径：devicePath
+ipfs API使用的端口：ipfsApiPort
+ipfs Gateway使用的端口：ipfsGatewayPort
+ipfs Swarm使用的端口：ipfsSwarmPort
+返回值：字符串(注册ID)
+说明：包含fail字符串视为失败
+
+2.删除设备目录分区挖矿（会删除ipfs所有文件，请慎重）
+请求方式：GET
+接口为：removeRegisterDevice
+参数：
+设备（挂载或分区）路径：devicePath
+返回值：字符串
+说明：包含success字符串视为成功，包含fail字符串视为失败
+
+3.根据设备挂载目录获取注册ID
+请求方式：GET
+接口为：getRegisterIdByDevicePath
+参数：
+设备（挂载或分区）路径：devicePath
+返回值：字符串(注册ID)
+说明：包含fail字符串视为失败
+
+4.获取当前版本下载链接
+请求方式：GET
+接口为：getVersionLink
+参数：无
+返回值：字符串，返回最新下载链接（如果是最新的，返回空字符串）
+
+
+
